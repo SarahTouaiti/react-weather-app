@@ -12,7 +12,7 @@ function App() {
           target="blank"
         >
           Sara Touaiti
-        </a>
+        </a>{" "}
         and is open-sourced on{" "}
         <a href="https://github.com/SarahTouaiti" target="blank">
           GitHub
