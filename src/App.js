@@ -6,7 +6,7 @@ function App() {
     <div className="App">
       Weather App
       <footer>
-        This project is coded by
+        This project is coded by{" "}
         <a
           href="https://www.linkedin.com/in/sara-touaiti-0350841b4/"
           target="blank"
