@@ -1,36 +1,49 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./Weather.css";
-import FormattedDate from "./formattedDate";
+import WeatherInfo from "./WeatherInfo";
 
-export default function Weather() {
-  const [ready, setReady] = useState(false);
-  const [weatherData, setWeatherData] = useState({});
+export default function Weather(props) {
+  const [weatherData, setWeatherData] = useState({ ready: false });
+  const [city, setCity] = useState(props.defaultCity);
   function handleResponse(response) {
     console.log(response.data);
     setWeatherData({
       city: response.data.city,
-      description: response.data.condition.description,
+      weatherDescription: response.data.condition.description,
       temperature: response.data.temperature.current,
       humidity: response.data.temperature.current,
       wind: response.data.wind.speed,
       icon: response.data.condition.icon_url,
       iconDescription: response.data.condition.icon,
       date: new Date(response.data.time * 1000),
+      ready: true,
     });
-    setReady(true);
   }
-  if (ready) {
+  function search() {
+    const apiKey = "81a35fctfab545b52d43e71743o42f03";
+    const apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}`;
+    axios.get(apiUrl).then(handleResponse);
+  }
+  function handleSubmit(event) {
+    event.preventDefault();
+    search();
+  }
+  function handleCityChange(event) {
+    setCity(event.target.value);
+  }
+  if (weatherData.ready) {
     return (
       <div className="Weather">
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-9">
               <input
                 type="search"
-                placeholder="enter a city.."
+                placeholder="Enter a city.."
                 className="form-control"
                 autoFocus="on"
+                onChange={handleCityChange}
               />
             </div>
             <div className="col-3">
@@ -42,43 +55,11 @@ export default function Weather() {
             </div>
           </div>
         </form>
-        <h1>New York</h1>
-        <ul>
-          <li>
-            <FormattedDate date={weatherData.date} />
-          </li>
-          <li className="text-capitalize">{weatherData.description}</li>
-        </ul>
-        <div className="row mt-3">
-          <div className="col-6">
-            <div className="clearfix">
-              <img
-                src={weatherData.icon}
-                alt={weatherData.iconDescription}
-                width={50}
-                height={50}
-                className="float-left"
-              />
-              <div className="float-left">
-                <span className="temperature">{weatherData.temperature}</span>
-                <span className="unit">°C</span>
-              </div>
-            </div>
-            <div className="col-6">
-              <ul>
-                <li>Precipitation: 15%</li>
-                <li>Humidity: {weatherData.humidity}%</li>
-                <li>Wind: {weatherData.wind} Km/h</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <WeatherInfo info={weatherData} />
       </div>
     );
   } else {
-    const apiKey = "81a35fctfab545b52d43e71743o42f03";
-    let city = "New York";
-    const apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}`;
-    axios.get(apiUrl).then(handleResponse);
+    search();
+    return "Loading..";
   }
 }
